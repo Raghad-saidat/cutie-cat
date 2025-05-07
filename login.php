@@ -22,7 +22,7 @@ if (!$conn) {
             $message = " Invalid email or password.";
         }
     } else {
-        $message = " Query error: " . odbc_errormsg($conn);
+        $message = "Login failed. User not found.";
     }
 }
 ?>
