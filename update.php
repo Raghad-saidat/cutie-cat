@@ -34,12 +34,12 @@ if (!$conn) {
         $delete_result = odbc_exec($conn, $delete_sql);
 
         if ($delete_result) {
-            $message = "✅ Profile deleted successfully!";
+            $message = "Profile deleted successfully!";
             session_destroy();
             header("Location: login.php");
             exit();
         } else {
-            $message = "Failed to delete profile: " . odbc_errormsg($conn);
+            $message = "Failed to delete profile: ";
         }
     }
 
@@ -56,10 +56,10 @@ if (!$conn) {
 
         if ($update_result) {
             $_SESSION['user'] = $new_username;
-            $message = "✅ Profile updated successfully!";
+            $message = "Profile updated successfully!";
             header("Location: update.php");
         } else {
-            $message = "Update failed: " . odbc_errormsg($conn);
+            $message = "Update failed: ";
         }
     }
 }
@@ -72,7 +72,7 @@ if (!$conn) {
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: #f0f2f5;
+            background: #1E2235;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -84,7 +84,7 @@ if (!$conn) {
             padding: 30px;
             border-radius: 10px;
             width: 400px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 15px  #F8D7D0;
         }
 
         input[type="text"],
@@ -98,7 +98,7 @@ if (!$conn) {
         }
 
         input[type="submit"] {
-            background: #17a2b8;
+            background: #F8D7D0;
             color: white;
             padding: 12px;
             border: none;
@@ -108,7 +108,7 @@ if (!$conn) {
         }
 
         input[type="submit"]:hover {
-            background: #138496;
+            background: #1E2235;
         }
 
         .message {
