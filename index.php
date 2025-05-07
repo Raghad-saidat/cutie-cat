@@ -17,7 +17,6 @@
             <li><a href="register.php">REGISTER</a></li>
             <li><a href="login.php">LOGIN</a></li>
             <li><a href="update.php">UPDATE INFO</a></li>
-            <li><a href="delete.php">DELET INFO</a></li>
         </ul>
     </nav>
     <div id="pet-header">
@@ -35,7 +34,7 @@
               <a href="wet_food.php"><h3>Wet Food</h3></a>
                 <p>Hydrating and flavorful canned food.</p>
             </div>
-            <div class="food-item" id="row">
+            <div class="food-item" id="raw">
                 <a href="raw_food.php"><h3>Raw Food</h3></a>
                 <p>A natural diet, requires careful preparation.</p>
                  </div>

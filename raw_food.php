@@ -28,16 +28,16 @@
             padding:0;
             margin:0;
         }
-        #rowfood{
+        #rawfood{
             display: flex;
     align-items: center; 
     gap: 10px; 
         }
-        #rowfood img{
+        #rawfood img{
             padding-left:200px;
             width:400px
         }
-#rowfood p{
+#rawfood p{
     padding-left:150px;
     font-size: xx-large;
 }
@@ -192,10 +192,10 @@
             <li><a href="#toy">TOYS</a></li>
         </ul>
         </nav>
-    <h1>Row food</h1>
+    <h1>raw food</h1>
    <section id="food1">
-    <div id="rowfood">
-        <img src="images/rowfood.webp" alt="Row Food 1">
+    <div id="rawfood">
+        <img src="images/rawfood.webp" alt="raw Food 1">
         <div class="calculator">
             <input type="number" id="num3" placeholder="Quantity" min="0">
             <p>Unit Price: 15 JD</p>
@@ -205,8 +205,8 @@
     </div>
         </section>
         <section id="food2">
-            <div id="rowfood">
-        <img src="images/rowfood2.png" alt="Row Food 2">  <div class="calculator">
+            <div id="rawfood">
+        <img src="images/rawfood2.png" alt="raw Food 2">  <div class="calculator">
             <input type="number" id="num1" placeholder="Quantity" min="0">
             <p>Unit Price: 10 JD</p>
             <button id="addBtn">Calculate Total</button>
@@ -215,8 +215,8 @@
         </div>
     </section>
     <section id="food3">
-        <div id="rowfood">
-        <img src="images/rowfood3.jpg" alt="Row Food 3">
+        <div id="rawfood">
+        <img src="images/rawfood3.jpg" alt="raw Food 3">
         <div class="calculator">
             <input type="number" id="num5" placeholder="Quantity" min="0">
             <p>Unit Price: 4 JD</p>

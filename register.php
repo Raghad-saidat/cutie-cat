@@ -8,12 +8,12 @@ if (!$conn) {
 } else if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user = trim($_POST['username']);
     $email = trim($_POST['email']);
-    $password = hash('sha1',$_POST['password']);
+    $password = hash('sha1', $_POST['password']);
 
     if (!empty($user) && !empty($email) && !empty($_POST['password'])) {
         $sql = "INSERT INTO users (username, email, password) VALUES ('$user', '$email', '$password')";
         if (odbc_exec($conn, $sql)) {
-            $_SESSION['user'] = $user['username'];
+            $_SESSION['user'] = $user;
             $message = " Registration successful!";
             header("Location: index.php");
         } else {
@@ -27,6 +27,7 @@ if (!$conn) {
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Register</title>
     <style>
@@ -38,6 +39,7 @@ if (!$conn) {
             align-items: center;
             height: 100vh;
         }
+
         form {
             background: #fff;
             padding: 30px;
@@ -45,13 +47,17 @@ if (!$conn) {
             width: 350px;
             box-shadow: 0 0 15px #F8D7D0;
         }
-        input[type="text"], input[type="email"], input[type="password"] {
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
             width: 100%;
             padding: 10px;
             margin: 8px 0 16px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+
         input[type="submit"] {
             background: #F8D7D0;
             color: white;
@@ -61,47 +67,62 @@ if (!$conn) {
             width: 100%;
             cursor: pointer;
         }
+
         input[type="submit"]:hover {
-            background: #1E2235 ;
+            background: #1E2235;
         }
+
         .message {
             margin-top: 15px;
             font-weight: bold;
         }
+
         .message.success {
             color: #28a745;
         }
+
         .message.error {
             color: #d9534f;
         }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
+
 <body>
 
-<form method="POST">
-    <h2>Register</h2>
-    <label>Username</label>
-    <input type="text" name="username" required>
+    <form method="POST">
+        <div class="top">
+            <h2>Register</h2>
+            <a href="index.php">Back</a>
+        </div>
+        <label>Username</label>
+        <input type="text" name="username" required>
 
-    <label>Email</label>
-    <input type="email" name="email" required>
+        <label>Email</label>
+        <input type="email" name="email" required>
 
-    <label>Password</label>
-    <input type="password" name="password" required>
+        <label>Password</label>
+        <input type="password" name="password" required>
 
-    <input type="submit" value="Register">
+        <input type="submit" value="Register">
 
-    <?php if (empty($message)): ?>
-    <div class="message error">
-        <?= $message ?>
-    </div>
-<?php else: ?>
-    <div class="message success">
-        <?= $message ?>
-    </div>
-<?php endif; ?>
-</form>
+        <?php if (empty($message)): ?>
+            <div class="message error">
+                <?= $message ?>
+            </div>
+        <?php else: ?>
+            <div class="message success">
+                <?= $message ?>
+            </div>
+        <?php endif; ?>
+    </form>
 
 </body>
-</html>
 
+</html>

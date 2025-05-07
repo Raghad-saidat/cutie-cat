@@ -4,53 +4,69 @@ if (!isset($_SESSION['user'])) {
     header("Location: login.php");
     exit();
 }
-$db = realpath("users.accdb");
-$conn_str = "Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=$db_file;";
-$conn = odbc_connect($conn_str, "", "");
+
+$conn = odbc_connect("users", "", "");
 
 $message = "";
 $user_data = null;
 
 if (!$conn) {
-    $message = " Database connection failed.";
+    $message = "Database connection failed.";
 } else {
     $username = $_SESSION['user'];
-    $sql = "SELECT * FROM users WHERE username = ?";
-    $stmt = odbc_prepare($conn, $sql);
 
-    if (odbc_execute($stmt, [$username])) {
-        $user_data = odbc_fetch_array($stmt);
+    $sql = "SELECT id, username, email, password FROM users WHERE username = '$username'";
+    $result = odbc_exec($conn, $sql);
+
+    if ($result) {
+        $user_data = odbc_fetch_array($result);
+        if (!$user_data || !isset($user_data['id'])) {
+            $message = "User data is incomplete or missing.";
+        }
+    } else {
+        $message = "Failed to fetch user data: " . odbc_errormsg($conn);
     }
-    if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id'])) {
+        $id = $_GET['id'];
+
+        $delete_sql = "DELETE FROM users WHERE id = $id";
+        $delete_result = odbc_exec($conn, $delete_sql);
+
+        if ($delete_result) {
+            $message = "✅ Profile deleted successfully!";
+            session_destroy();
+            header("Location: login.php");
+            exit();
+        } else {
+            $message = "Failed to delete profile: " . odbc_errormsg($conn);
+        }
+    }
+
+    if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($user_data['id'])) {
         $new_username = trim($_POST['username']);
         $new_email = trim($_POST['email']);
-        $new_password = $_POST['password'];
+        $new_password = trim($_POST['password']);
 
-        $update_sql = "UPDATE users SET username=?, email=?" .
-                      (!empty($new_password) ? ", password=?" : "") .
-                      " WHERE id=?";
-        $update_stmt = odbc_prepare($conn, $update_sql);
+        $hashed_password = !empty($new_password) ? hash('sha1', $new_password) : $user_data['password'];
 
-        $params = [$new_username, $new_email];
-        if (!empty($new_password)) {
-            $params[] = password_hash($new_password, PASSWORD_DEFAULT);
-        }
-        $params[] = $user_data['id'];
+        $update_sql = "UPDATE users SET username = '$new_username', email = '$new_email', password = '$hashed_password' WHERE id = {$user_data['id']}";
 
-        if (odbc_execute($update_stmt, $params)) {
+        $update_result = odbc_exec($conn, $update_sql);
+
+        if ($update_result) {
             $_SESSION['user'] = $new_username;
-            $message = " Profile updated successfully!";
+            $message = "✅ Profile updated successfully!";
+            header("Location: update.php");
         } else {
-            $message = " Update failed: " . odbc_errormsg($conn);
+            $message = "Update failed: " . odbc_errormsg($conn);
         }
     }
-
-    odbc_close($conn);
 }
 ?>
-
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Update Profile</title>
     <style>
@@ -62,20 +78,25 @@ if (!$conn) {
             align-items: center;
             height: 100vh;
         }
+
         form {
             background: white;
             padding: 30px;
             border-radius: 10px;
             width: 400px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
-        input[type="text"], input[type="email"], input[type="password"] {
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
             width: 100%;
             padding: 10px;
             margin: 8px 0 16px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+
         input[type="submit"] {
             background: #17a2b8;
             color: white;
@@ -85,40 +106,69 @@ if (!$conn) {
             width: 100%;
             cursor: pointer;
         }
+
         input[type="submit"]:hover {
             background: #138496;
         }
+
         .message {
             margin-top: 15px;
             font-weight: bold;
             color: #d9534f;
         }
+
         .message.success {
             color: #28a745;
         }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .delete {
+            display: inline-block;
+            margin-top: 10px;
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .delete-container {
+            text-align: center;
+            margin-top: 30px;
+        }
     </style>
 </head>
+
 <body>
-
-<form method="POST">
-    <h2>Update Profile</h2>
-    <label>Username</label>
-    <input type="text" name="username" value="<?= htmlspecialchars($user_data['username']) ?>" required>
-
-    <label>Email</label>
-    <input type="email" name="email" value="<?= htmlspecialchars($user_data['email']) ?>" required>
-
-    <label>New Password (leave blank to keep current)</label>
-    <input type="password" name="password">
-
-    <input type="submit" value="Update">
-
-    <?php if (!empty($message)): ?>
-        <div class="message <?= strpos($message, '✅') !== false ? 'success' : '' ?>">
-            <?= $message ?>
+    <form method="POST">
+        <div class="top">
+            <h2>Update Profile</h2>
+            <a href="index.php">Back</a>
         </div>
-    <?php endif; ?>
-</form>
+        <label>Username</label>
+        <input type="text" name="username" value="<?= htmlspecialchars($user_data['username']) ?>" required>
+
+        <label>Email</label>
+        <input type="email" name="email" value="<?= htmlspecialchars($user_data['email']) ?>" required>
+
+        <label>New Password (leave blank to keep current)</label>
+        <input type="password" name="password">
+
+        <input type="submit" value="Update">
+        <div class="delete-container">
+            <a class="delete" href="update.php?action=delete&id=<?= $user_data['id'] ?>">Delete Profile</a>
+        </div>
+
+        <?php if (!empty($message)): ?>
+            <div class="message <?= strpos($message, '✅') !== false ? 'success' : '' ?>">
+                <?= $message ?>
+            </div>
+        <?php endif; ?>
+    </form>
 
 </body>
+
 </html>

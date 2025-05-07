@@ -57,8 +57,8 @@ body {
     background-color:#F8D7D0;
     color: #191970;
 }
-.food-item#row{
-    background-color:#F8D7D0 ;
+#raw{
+    background-color:#F8D7D0 !important;
     color: #191970;
 }
 #imgpow{

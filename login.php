@@ -29,6 +29,7 @@ if (!$conn) {
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Login</title>
     <style>
@@ -40,20 +41,24 @@ if (!$conn) {
             align-items: center;
             height: 100vh;
         }
+
         form {
             background: white;
             padding: 30px;
             border-radius: 10px;
             width: 350px;
-            box-shadow: 0 0 15px #F8D7D0 ;
+            box-shadow: 0 0 15px #F8D7D0;
         }
-        input[type="email"], input[type="password"] {
+
+        input[type="email"],
+        input[type="password"] {
             width: 100%;
             padding: 10px;
             margin: 8px 0 16px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+
         input[type="submit"] {
             background: #F8D7D0;
             color: white;
@@ -63,43 +68,58 @@ if (!$conn) {
             width: 100%;
             cursor: pointer;
         }
+
         input[type="submit"]:hover {
-            background:#1E2235;
+            background: #1E2235;
         }
+
         .message {
             margin-top: 15px;
             font-weight: bold;
         }
+
         .message.success {
             color: #28a745;
         }
+
         .message.error {
             color: #d9534f;
         }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
+
 <body>
+    <form method="POST">
+        <div class="top">
+            <h2>Login</h2>
+            <a href="index.php">Back</a>
+        </div>
+        <label>Email</label>
+        <input type="email" name="email" required>
 
-<form method="POST">
-    <h2>Login</h2>
-    <label>Email</label>
-    <input type="email" name="email" required>
+        <label>Password</label>
+        <input type="password" name="password" required>
 
-    <label>Password</label>
-    <input type="password" name="password" required>
+        <input type="submit" value="Login">
 
-    <input type="submit" value="Login">
-
-    <?php if (empty($message)): ?>
-    <div class="message error">
-        <?= $message ?>
-    </div>
-<?php else: ?>
-    <div class="message success">
-        <?= $message ?>
-    </div>
-<?php endif; ?>
-</form>
+        <?php if (empty($message)): ?>
+            <div class="message error">
+                <?= $message ?>
+            </div>
+        <?php else: ?>
+            <div class="message success">
+                <?= $message ?>
+            </div>
+        <?php endif; ?>
+    </form>
 
 </body>
+
 </html>
