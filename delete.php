@@ -1,38 +1,28 @@
 <?php
-$db_file = realpath("users.accdb");
-$conn_str = "Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=$db_file;";
-$conn = odbc_connect($conn_str, "", "");
+session_start();
+$conn = odbc_connect('users', "", "");
 
 $message = "";
-$results = [];
-$search_query = "";
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_id'])) {
-    $user_id = intval($_POST['delete_id']);
-    $sql = "DELETE FROM users WHERE id = ?";
-    $stmt = odbc_prepare($conn, $sql);
+if (!$conn) {
+    $message = " Failed to connect to the database.";
+} else if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $user = trim($_POST['username']);
+    $email = trim($_POST['email']);
+    $password = hash('sha1',$_POST['password']);
 
-    if (odbc_execute($stmt, [$user_id])) {
-        $message = "✅ User deleted successfully.";
-    } else {
-        $message = "❌ Deletion failed: " . odbc_errormsg($conn);
-    }
-}
-if (isset($_GET['q'])) {
-    $search_query = trim($_GET['q']);
-    $sql = "SELECT id, username, email FROM users WHERE username LIKE ? OR email LIKE ?";
-    $stmt = odbc_prepare($conn, $sql);
-
-    $like = "%" . $search_query . "%";
-    if (odbc_execute($stmt, [$like, $like])) {
-        while ($row = odbc_fetch_array($stmt)) {
-            $results[] = $row;
+    if (!empty($user) && !empty($email) && !empty($_POST['password'])) {
+        $sql = "INSERT INTO users (username, email, password) VALUES ('$user', '$email', '$password')";
+        if (odbc_exec($conn, $sql)) {
+            $_SESSION['user'] = $user['username'];
+            $message = " Registration successful!";
+            header("Location: index.php");
+        } else {
+            $message = " Error: " . odbc_errormsg($conn);
         }
     } else {
-        $message = " Search failed: " . odbc_errormsg($conn);
+        $message = " All fields are required.";
     }
 }
-
-odbc_close($conn);
 ?>
 
 <!DOCTYPE html>

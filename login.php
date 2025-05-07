@@ -1,9 +1,6 @@
 <?php
 session_start();
-$db = 'users';
-$email='';
-$password='';
-$conn = odbc_connect($db, "", "");
+$conn = odbc_connect('users', "", "");
 
 $message = "";
 
@@ -11,25 +8,22 @@ if (!$conn) {
     $message = " Failed to connect to database.";
 } elseif ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST['email']);
-    $password = $_POST['password'];
+    $password = hash('sha1', $_POST['password']);
 
-    $sql = "SELECT * FROM users WHERE email = ?";
-    $stmt = odbc_prepare($conn, $sql);
+    $sql = "SELECT * FROM users WHERE email = '$email'";
+    $result = odbc_exec($conn, $sql);
 
-    if (odbc_execute($stmt, [$email])) {
-        $user = odbc_fetch_array($stmt);
-
-        if ($user && password_verify($password, $user['password'])) {
+    if ($user = odbc_fetch_array($result)) {
+        if ($user && $password == $user['password']) {
             $_SESSION['user'] = $user['username'];
             $message = " Login successful! Welcome, " . $user['username'];
+            header("Location: index.php");
         } else {
             $message = " Invalid email or password.";
         }
     } else {
         $message = " Query error: " . odbc_errormsg($conn);
     }
-
-    odbc_close($conn);
 }
 ?>
 
@@ -75,10 +69,12 @@ if (!$conn) {
         .message {
             margin-top: 15px;
             font-weight: bold;
-            color: #d9534f;
         }
         .message.success {
             color: #28a745;
+        }
+        .message.error {
+            color: #d9534f;
         }
     </style>
 </head>
@@ -94,11 +90,15 @@ if (!$conn) {
 
     <input type="submit" value="Login">
 
-    <?php if (!empty($message)): ?>
-        <div class="message <?= strpos($message, '') !== false ? 'success' : '' ?>">
-            <?= $message ?>
-        </div>
-    <?php endif; ?>
+    <?php if (empty($message)): ?>
+    <div class="message error">
+        <?= $message ?>
+    </div>
+<?php else: ?>
+    <div class="message success">
+        <?= $message ?>
+    </div>
+<?php endif; ?>
 </form>
 
 </body>

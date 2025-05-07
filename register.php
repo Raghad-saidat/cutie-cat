@@ -1,7 +1,6 @@
 <?php
-$db_path = "C:\\xampp\\htdocs\\cuti cat project\\users.accdb";
-$conn_str = "Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=$db_path;";
-$conn = odbc_connect($conn_str, "", "");
+session_start();
+$conn = odbc_connect('users', "", "");
 
 $message = "";
 if (!$conn) {
@@ -9,22 +8,20 @@ if (!$conn) {
 } else if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user = trim($_POST['username']);
     $email = trim($_POST['email']);
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $password = hash('sha1',$_POST['password']);
 
     if (!empty($user) && !empty($email) && !empty($_POST['password'])) {
-        $sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
-        $stmt = odbc_prepare($conn, $sql);
-
-        if (odbc_execute($stmt, [$user, $email, $password])) {
+        $sql = "INSERT INTO users (username, email, password) VALUES ('$user', '$email', '$password')";
+        if (odbc_exec($conn, $sql)) {
+            $_SESSION['user'] = $user['username'];
             $message = " Registration successful!";
+            header("Location: index.php");
         } else {
             $message = " Error: " . odbc_errormsg($conn);
         }
     } else {
         $message = " All fields are required.";
     }
-
-    odbc_close($conn);
 }
 ?>
 
@@ -70,10 +67,12 @@ if (!$conn) {
         .message {
             margin-top: 15px;
             font-weight: bold;
-            color: #d9534f;
         }
         .message.success {
             color: #28a745;
+        }
+        .message.error {
+            color: #d9534f;
         }
     </style>
 </head>
@@ -92,11 +91,15 @@ if (!$conn) {
 
     <input type="submit" value="Register">
 
-    <?php if (!empty($message)): ?>
-        <div class="message <?= strpos($message, '✅') !== false ? 'success' : '' ?>">
-            <?= $message ?>
-        </div>
-    <?php endif; ?>
+    <?php if (empty($message)): ?>
+    <div class="message error">
+        <?= $message ?>
+    </div>
+<?php else: ?>
+    <div class="message success">
+        <?= $message ?>
+    </div>
+<?php endif; ?>
 </form>
 
 </body>
