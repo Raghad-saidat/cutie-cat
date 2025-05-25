@@ -17,6 +17,7 @@
             <li><a href="register.php">REGISTER</a></li>
             <li><a href="login.php">LOGIN</a></li>
             <li><a href="update.php">UPDATE INFO</a></li>
+            <li><a href="namesuggester.php">names</a><li>
         </ul>
     </nav>
     <div id="pet-header">
